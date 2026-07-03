@@ -1,5 +1,7 @@
 const dates = ["7/8", "7/9", "7/10"];
 const storageKey = "qxes-subteacher-system-v2";
+const dailyLogsKey = "cx_daily_logs";
+const checklistKey = "cx_checklist";
 
 const defaultData = {
   venues: [
@@ -143,6 +145,7 @@ const staticData = {
 };
 
 let data = loadData();
+let dailyLogs = loadDailyLogs();
 
 function loadData() {
   const raw = localStorage.getItem(storageKey);
@@ -156,7 +159,31 @@ function loadData() {
 
 function saveData() {
   localStorage.setItem(storageKey, JSON.stringify(data));
+  syncCxChecklist();
   updateSummary();
+}
+
+function loadDailyLogs() {
+  const raw = localStorage.getItem(dailyLogsKey);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDailyLogs() {
+  localStorage.setItem(dailyLogsKey, JSON.stringify(dailyLogs));
+}
+
+function syncCxChecklist() {
+  const checklist = data.tasks.map((task) => ({
+    ...task,
+    priority: task.priority === "高" ? "High" : task.priority === "中" ? "Medium" : task.priority === "低" ? "Low" : task.priority,
+  }));
+  localStorage.setItem(checklistKey, JSON.stringify(checklist));
 }
 
 function id(prefix) {
@@ -211,6 +238,7 @@ function renderAll() {
   renderPeople();
   renderDaily();
   renderDocuments();
+  renderDailyLogs();
   updateSummary();
 }
 
@@ -666,6 +694,60 @@ function setupExportButtons() {
   });
 }
 
+function renderDailyLogs() {
+  const root = document.querySelector("#dailyLogList");
+  root.innerHTML = "";
+  if (!dailyLogs.length) {
+    const empty = el("article", "log-card");
+    empty.appendChild(el("p", "", "目前尚未建立試務日誌。"));
+    root.appendChild(empty);
+    return;
+  }
+  dailyLogs
+    .slice()
+    .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+    .forEach((log) => {
+      const card = el("article", `log-card ${log.converted ? "is-converted" : ""}`);
+      const category = el("div");
+      category.append(pill(log.category, "wait"), el("p", "", log.createdAt ? log.createdAt.slice(0, 10) : ""));
+      const description = el("div");
+      description.append(el("strong", "", "狀況描述"), el("p", "", log.description));
+      const suggestion = el("div");
+      suggestion.append(el("strong", "", "明年建議"), el("p", "", log.suggestion));
+      const actions = el("div", "row-actions");
+      if (log.converted) {
+        actions.appendChild(pill("已轉入 Checklist", "done"));
+      } else {
+        const convert = el("button", "mini-button", "轉為明年優化工作");
+        convert.type = "button";
+        convert.addEventListener("click", () => convertLogToTask(log.id));
+        actions.appendChild(convert);
+      }
+      card.append(category, description, suggestion, actions);
+      root.appendChild(card);
+    });
+}
+
+function convertLogToTask(logId) {
+  const log = dailyLogs.find((item) => item.id === logId);
+  if (!log || log.converted) return;
+  const task = {
+    id: id("next"),
+    phase: "甄試後",
+    title: `【明年優化】${log.suggestion}`,
+    priority: "高",
+    due: "",
+    done: false,
+  };
+  data.tasks.push(task);
+  log.converted = true;
+  log.taskId = task.id;
+  saveDailyLogs();
+  saveData();
+  renderChecklist();
+  renderDailyLogs();
+}
+
 function updateSummary() {
   const done = data.tasks.filter((task) => task.done).length;
   const pending = data.tasks.length - done;
@@ -744,11 +826,31 @@ function setupForms() {
     renderPeople();
   });
 
+  document.querySelector("#dailyLogForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const log = {
+      id: id("log"),
+      category: form.elements.category.value,
+      description: form.elements.description.value.trim(),
+      suggestion: form.elements.suggestion.value.trim(),
+      converted: false,
+      taskId: "",
+      createdAt: new Date().toISOString(),
+    };
+    if (!log.description || !log.suggestion) return;
+    dailyLogs.push(log);
+    saveDailyLogs();
+    form.reset();
+    renderDailyLogs();
+  });
+
   document.querySelector("#taskSearch").addEventListener("input", renderChecklist);
   document.querySelector("#resetProjectData").addEventListener("click", () => {
     if (!confirm("確定要還原預設資料？目前新增與修改的資料會清除。")) return;
     localStorage.removeItem(storageKey);
     data = structuredClone(defaultData);
+    saveData();
     renderAll();
   });
 }
@@ -768,4 +870,5 @@ function setupTabs() {
 setupForms();
 setupExportButtons();
 setupTabs();
+syncCxChecklist();
 renderAll();
