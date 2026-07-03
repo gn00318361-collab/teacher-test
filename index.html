@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>115學年度青溪國小代理代課教師甄試</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">青溪國小試務專案</p>
+        <h1>115學年度代理代課教師甄試</h1>
+      </div>
+      <div class="status-strip" aria-label="專案摘要">
+        <div><span id="summaryDone">0</span><small>已完成</small></div>
+        <div><span id="summaryPending">0</span><small>待辦</small></div>
+        <div><span id="summaryQuestions">0</span><small>待確認</small></div>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="網站頁面">
+      <button class="tab is-active" data-page="overview" type="button">專案總覽</button>
+      <button class="tab" data-page="checklist" type="button">Checklist</button>
+      <button class="tab" data-page="people" type="button">人員分工</button>
+      <button class="tab" data-page="daily" type="button">每日流程</button>
+      <button class="tab" data-page="documents" type="button">文件中心</button>
+    </nav>
+
+    <main>
+      <section class="dashboard" aria-labelledby="dashboard-title">
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">試務控制 Dashboard</p>
+            <h2 id="dashboard-title">即時專案狀態</h2>
+          </div>
+          <div class="dashboard-date">今日：2026-07-03</div>
+        </div>
+        <div class="dashboard-grid">
+          <article class="metric-card">
+            <span class="metric-label">目前考程階段</span>
+            <strong id="dashboardPhase">事前準備階段</strong>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">未完成工作數</span>
+            <strong id="dashboardPendingTasks">0</strong>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">待指派／待確認人數</span>
+            <strong id="dashboardPendingPeople">0</strong>
+          </article>
+          <article class="metric-card progress-card">
+            <span class="metric-label">工作完成率</span>
+            <div class="progress-line">
+              <strong id="dashboardProgressText">0%</strong>
+              <span id="dashboardProgressDetail">0 / 0</span>
+            </div>
+            <div class="progress-track" aria-label="今日進度條">
+              <div id="dashboardProgressBar" class="progress-bar"></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page is-active" id="page-overview" aria-labelledby="overview-title">
+        <div class="section-heading">
+          <h2 id="overview-title">專案總覽</h2>
+          <p>7/8 至 7/10 甄試工作控管</p>
+        </div>
+        <div class="overview-grid">
+          <section class="panel">
+            <h3>基本資料</h3>
+            <dl class="info-list">
+              <div><dt>專案名稱</dt><dd>115學年度青溪國小代理代課教師甄試</dd></div>
+              <div><dt>甄試日期</dt><dd>7/8、7/9、7/10</dd></div>
+              <div><dt>試務總召</dt><dd>輔導主任</dd></div>
+              <div><dt>人事窗口</dt><dd>人事主任王建能</dd></div>
+            </dl>
+          </section>
+          <section class="panel">
+            <h3>場地安排</h3>
+            <div id="venueList" class="compact-list"></div>
+          </section>
+          <section class="panel highlight">
+            <h3>今日優先處理</h3>
+            <ol id="todayFocus" class="ordered-list"></ol>
+          </section>
+          <section class="panel">
+            <h3>待確認事項</h3>
+            <ul id="overviewQuestions" class="plain-list"></ul>
+          </section>
+        </div>
+      </section>
+
+      <section class="page" id="page-checklist" aria-labelledby="checklist-title">
+        <div class="section-heading">
+          <h2 id="checklist-title">Checklist 管理</h2>
+          <p>可新增工作、設定期限、依優先順序排序與搜尋</p>
+        </div>
+        <section class="panel">
+          <h3>新增工作</h3>
+          <form class="form-grid" id="taskForm">
+            <label>階段
+              <select name="phase">
+                <option>事前準備</option>
+                <option>甄試當天</option>
+                <option>甄試後</option>
+              </select>
+            </label>
+            <label>工作名稱
+              <input name="title" type="text" required placeholder="例如：列印試教評分表" />
+            </label>
+            <label>優先順序
+              <select name="priority">
+                <option value="高">高</option>
+                <option value="中">中</option>
+                <option value="低">低</option>
+              </select>
+            </label>
+            <label>完成期限
+              <input name="due" type="date" />
+            </label>
+            <button class="primary-button" type="submit">新增工作</button>
+          </form>
+        </section>
+        <div class="toolbar split-toolbar">
+          <label class="search-box">搜尋
+            <input id="taskSearch" type="search" placeholder="輸入工作名稱、階段或狀態" />
+          </label>
+          <button id="resetProjectData" class="text-button danger" type="button">還原預設資料</button>
+        </div>
+        <div id="checklistGroups" class="stack"></div>
+      </section>
+
+      <section class="page" id="page-people" aria-labelledby="people-title">
+        <div class="section-heading">
+          <h2 id="people-title">人員與委員管理</h2>
+          <p>可新增、修改姓名、指定職務、指定日期，資料保存在 localStorage</p>
+        </div>
+
+        <div class="two-column">
+          <section class="panel">
+            <h3>新增工作人員</h3>
+            <form class="form-stack" id="staffForm">
+              <input name="id" type="hidden" />
+              <label>姓名 <input name="name" type="text" required placeholder="例如：王小明" /></label>
+              <label>職務
+                <select name="role">
+                  <option>試務總召</option>
+                  <option>人事資格確認</option>
+                  <option>試務承辦</option>
+                  <option>報到與身分核對</option>
+                  <option>等候區管理與考生引導</option>
+                  <option>試教與口試計時</option>
+                  <option>評分表發放與回收</option>
+                  <option>成績登錄</option>
+                  <option>成績複核</option>
+                  <option>結果公告製作</option>
+                  <option>資料歸檔</option>
+                </select>
+              </label>
+              <label>日期
+                <select name="date">
+                  <option>7/8</option>
+                  <option>7/9</option>
+                  <option>7/10</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">儲存工作人員</button>
+            </form>
+          </section>
+          <section class="panel">
+            <h3>尚未安排提醒</h3>
+            <div id="staffGaps" class="compact-list"></div>
+          </section>
+        </div>
+
+        <section class="panel table-panel">
+          <h3>工作人員清單</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>姓名</th>
+                  <th>職務</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="staffRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="two-column lower-grid">
+          <section class="panel">
+            <h3>新增評審委員</h3>
+            <form class="form-stack" id="judgeForm">
+              <input name="id" type="hidden" />
+              <label>姓名 <input name="name" type="text" required placeholder="例如：王麒喻" /></label>
+              <label>日期
+                <select name="date">
+                  <option>7/8</option>
+                  <option>7/9</option>
+                  <option>7/10</option>
+                </select>
+              </label>
+              <label>狀態
+                <select name="status">
+                  <option value="已確認">已確認</option>
+                  <option value="待確認">待確認</option>
+                  <option value="部分時間">部分時間</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">儲存評審委員</button>
+            </form>
+          </section>
+          <section class="panel">
+            <h3>評審委員依日期分類</h3>
+            <div id="judgeGroups" class="compact-list"></div>
+          </section>
+        </div>
+
+        <section class="panel table-panel">
+          <h3>試務工作建議分工</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>工作項目</th>
+                  <th>建議人數</th>
+                  <th>時間</th>
+                  <th>注意事項</th>
+                </tr>
+              </thead>
+              <tbody id="assignmentRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel table-panel">
+          <h3>兼任原則</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>工作組合</th>
+                  <th>判斷</th>
+                  <th>原因</th>
+                </tr>
+              </thead>
+              <tbody id="compatibilityRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" id="page-daily" aria-labelledby="daily-title">
+        <div class="section-heading">
+          <h2 id="daily-title">每日流程</h2>
+          <p>依 7/8、7/9、7/10 分日檢查</p>
+        </div>
+        <div id="dailyFlow" class="daily-grid"></div>
+      </section>
+
+      <section class="page" id="page-documents" aria-labelledby="documents-title">
+        <div class="section-heading">
+          <h2 id="documents-title">文件中心</h2>
+          <p>已完成文件與待製作文件</p>
+        </div>
+        <section class="panel export-panel">
+          <div>
+            <h3>一鍵匯出 Word</h3>
+            <p>系統會讀取目前 localStorage 的最新資料，產生可用 Word 開啟的表格文件。</p>
+          </div>
+          <div class="export-actions">
+            <button id="exportStaffDoc" class="primary-button" type="button">匯出人員分工表</button>
+            <button id="exportScoreDoc" class="primary-button" type="button">匯出委員評分表格</button>
+          </div>
+        </section>
+        <div id="documentList" class="document-grid"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
