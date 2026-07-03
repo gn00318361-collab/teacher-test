@@ -446,7 +446,8 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   min-height: 40px;
   border: 1px solid var(--line);
@@ -455,6 +456,11 @@ select {
   color: var(--ink);
   background: #ffffff;
   font: inherit;
+}
+
+textarea {
+  min-height: 88px;
+  resize: vertical;
 }
 
 .search-box {
@@ -666,6 +672,50 @@ th {
   cursor: not-allowed;
 }
 
+.learning-log {
+  margin-top: 28px;
+}
+
+.log-form {
+  display: grid;
+  grid-template-columns: 160px minmax(240px, 1fr) minmax(240px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.log-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.log-card {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.log-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.log-card p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.log-card.is-converted {
+  background: #f7fbf9;
+  border-color: #b9e1d1;
+}
+
 @media (max-width: 920px) {
   .topbar,
   .section-heading {
@@ -701,6 +751,11 @@ th {
 
   .form-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .log-form,
+  .log-card {
+    grid-template-columns: 1fr;
   }
 
   .form-grid .primary-button {

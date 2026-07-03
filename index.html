@@ -280,6 +280,36 @@
         </section>
         <div id="documentList" class="document-grid"></div>
       </section>
+
+      <section class="learning-log" aria-labelledby="learning-log-title">
+        <div class="section-heading">
+          <h2 id="learning-log-title">第七階段：試務日誌</h2>
+          <p>把今年的狀況直接留下來，轉成明年優化工作</p>
+        </div>
+        <section class="panel">
+          <form class="log-form" id="dailyLogForm">
+            <label>分類
+              <select name="category">
+                <option>流程</option>
+                <option>場地</option>
+                <option>人員</option>
+                <option>表件</option>
+                <option>設備</option>
+                <option>考生服務</option>
+                <option>其他</option>
+              </select>
+            </label>
+            <label>狀況描述
+              <textarea name="description" required placeholder="例如：報到時段人流集中，身分核對等待較久"></textarea>
+            </label>
+            <label>明年建議
+              <textarea name="suggestion" required placeholder="例如：明年報到區增加一名支援人員，並提前分流"></textarea>
+            </label>
+            <button class="primary-button" type="submit">新增試務日誌</button>
+          </form>
+        </section>
+        <div id="dailyLogList" class="log-list"></div>
+      </section>
     </main>
 
     <script src="app.js"></script>
